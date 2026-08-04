@@ -16,8 +16,28 @@ navLinks.querySelectorAll('a').forEach(link => {
 const contactForm = document.getElementById('contactForm');
 const formNote = document.getElementById('formNote');
 
-contactForm.addEventListener('submit', (e) => {
+contactForm.addEventListener('submit', async (e) => {
   e.preventDefault();
-  formNote.textContent = "Thanks for reaching out! This form isn't connected yet — for now, please email isabellarobledo3@gmail.com directly.";
-  contactForm.reset();
+  const submitButton = contactForm.querySelector('button[type="submit"]');
+  submitButton.disabled = true;
+  formNote.textContent = 'Sending...';
+
+  try {
+    const response = await fetch(contactForm.action, {
+      method: 'POST',
+      body: new FormData(contactForm),
+      headers: { Accept: 'application/json' }
+    });
+
+    if (response.ok) {
+      formNote.textContent = "Thanks for reaching out! We'll get back to you soon.";
+      contactForm.reset();
+    } else {
+      formNote.textContent = 'Something went wrong. Please email isabellarobledo3@gmail.com directly.';
+    }
+  } catch {
+    formNote.textContent = 'Something went wrong. Please email isabellarobledo3@gmail.com directly.';
+  } finally {
+    submitButton.disabled = false;
+  }
 });
